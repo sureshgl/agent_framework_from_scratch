@@ -1,10 +1,10 @@
 {
   "rules": [
-    {"pattern": "erp.read_*", "action": "allow"},
-    {"pattern": "erp.list_*", "action": "allow"},
+    {"pattern": "erp__read_*", "action": "allow"},
+    {"pattern": "erp__list_*", "action": "allow"},
     {"pattern": "web_search", "action": "allow"},
-    {"pattern": "erp.post_invoice", "action": "ask"},
-    {"pattern": "erp.block_invoice", "action": "ask"},
+    {"pattern": "erp__post_invoice", "action": "ask"},
+    {"pattern": "erp__block_invoice", "action": "ask"},
     {"pattern": "*", "action": "deny"}
   ]
 }

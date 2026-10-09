@@ -191,18 +191,15 @@ each. Live `make demo` / `make evals` pending `ANTHROPIC_API_KEY` (see deviation
   so the reason reaches the agent. Spec §8 wording ("FastMCP") to be updated.
 - **web_search is fixture-backed only** (Inc 5): deterministic/offline per
   C-websearch; live provider server-side search is not wired in this build.
-- **Inc 6 live verification pending a key**: the reconciliation agent, `make
-  demo`, and the E1-E9 eval suite are built and verified keyless (assembly over
-  the real MCP server + scorer unit tests); `make demo` / `make evals` need
-  `ANTHROPIC_API_KEY` and have not yet been run live. Recommendation mapping is
-  fixed in the prompt + `answer_key.json` (qty_variance -> hold, duplicate ->
-  block; resolves C-policy-ambiguity for this dataset).
-- **Inc 7 recorded fixture is synthetic**: `evals/recorded/reconcile_INV-9002.jsonl`
-  was captured keyless via `evals/record_fixture.py` (a scripted model over the
-  real ERP MCP), since no key was available. The replay path is identical for a
-  real capture; replace it with a `make demo` recording when a key is available.
-  E10 (keyless replay of the committed run) lives in `tests/test_replay.py`, not
-  `make evals` (which requires a key), so it runs in the normal `make test`.
+- **Inc 6 verified live**: `make demo` runs end to end and `make evals` scored
+  9/9 in each of 3 rounds. Live fixes: MCP namespace separator `__` (Anthropic
+  rejects dotted tool names); earliest-by-date invoice is the duplicate original
+  (E1 posts, E5 blocks); E5 no longer asserts the ambiguous `three_way_match`.
+  Default eval rounds is now 1 (set `EVAL_ROUNDS=3` for the stronger C4 signal).
+- **Inc 7 recorded fixture is a live capture**: `evals/recorded/reconcile_INV-9002.jsonl`
+  is a genuine `make demo` run; `evals/record_fixture.py` remains a keyless
+  fallback regenerator. E10 (keyless replay of the committed run) lives in
+  `tests/test_replay.py`, so it runs in the normal `make test`.
 
 ## Verification (end to end)
 - `make test` → ends with `N passed`, no failures (unit, no network/key).

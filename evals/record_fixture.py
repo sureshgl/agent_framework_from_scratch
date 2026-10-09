@@ -2,11 +2,14 @@
 
     python -m evals.record_fixture
 
-Produces `evals/recorded/reconcile_INV-9002.jsonl`: a reconciliation of INV-9002
-(a hidden per-unit overcharge -> block, with the approval gate firing). It is
-recorded keyless — a scripted stand-in model over the *real* ERP MCP server — so
-it can be regenerated anywhere. Replace it with a real-LLM capture from `make
-demo` once a key is available; the replay path is identical either way.
+Produces a reconciliation of INV-9002 (a hidden per-unit overcharge -> block,
+with the approval gate firing), recorded keyless — a scripted stand-in model over
+the *real* ERP MCP server — so it can be regenerated anywhere.
+
+Note: the committed `evals/recorded/reconcile_INV-9002.jsonl` is a GENUINE live
+capture from `make demo`. This script is a keyless fallback regenerator; it
+overwrites that file with a synthetic (but structurally identical) recording, so
+only run it when you cannot capture a live run.
 """
 
 from __future__ import annotations
@@ -55,12 +58,12 @@ class _Scripted:
 
 
 RESPONSES = [
-    _tool("c1", "erp.read_invoice", {"invoice_id": "INV-9002"}),
-    _tool("c2", "erp.read_po", {"po_id": "PO-1002"}),
-    _tool("c3", "erp.read_goods_receipts", {"po_line": "PO-1002-10"}),
-    _tool("c4", "erp.read_goods_receipts", {"po_line": "PO-1002-20"}),
+    _tool("c1", "erp__read_invoice", {"invoice_id": "INV-9002"}),
+    _tool("c2", "erp__read_po", {"po_id": "PO-1002"}),
+    _tool("c3", "erp__read_goods_receipts", {"po_line": "PO-1002-10"}),
+    _tool("c4", "erp__read_goods_receipts", {"po_line": "PO-1002-20"}),
     _tool("c5", "web_search", {"query": "Globex Industries supplier"}),
-    _tool("c6", "erp.block_invoice", {"invoice_id": "INV-9002", "reason": "price variance on PO-1002-20"}),
+    _tool("c6", "erp__block_invoice", {"invoice_id": "INV-9002", "reason": "price variance on PO-1002-20"}),
     _text(REPORT),
 ]
 

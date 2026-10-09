@@ -123,7 +123,9 @@ class MCPToolset:
 
     def _wrap(self, spec: Any) -> Tool:
         remote_name = spec.name
-        display = f"{self.namespace}.{remote_name}" if self.namespace else remote_name
+        # Namespace with "__" (not "."): tool names exposed to the model must
+        # match ^[a-zA-Z0-9_-]{1,128}$, which excludes dots.
+        display = f"{self.namespace}__{remote_name}" if self.namespace else remote_name
         schema = spec.input_schema or {"type": "object", "properties": {}}
 
         def caller(**kwargs: Any) -> str:

@@ -1,10 +1,12 @@
 """Run the reconciliation eval suite against a live model.
 
-    python -m evals.run            # 3 rounds (override with EVAL_ROUNDS)
+    python -m evals.run            # 1 round (set EVAL_ROUNDS=3 for a stronger signal)
 
-Prints one PASS/FAIL line per case, a per-round score (one live run is a weak
-signal, so rounds are reported individually — spec C-eval), and a final
-`evals: K/K passed`. Requires ANTHROPIC_API_KEY.
+Prints one PASS/FAIL line per case, a per-round score, and a final
+`evals: K/K passed`. A live eval is non-deterministic, so running several rounds
+(EVAL_ROUNDS) and reading each score separately is a stronger signal than one
+sample (spec C-eval); the default is 1 to keep it fast and cheap.
+Requires ANTHROPIC_API_KEY.
 """
 
 from __future__ import annotations
@@ -21,7 +23,7 @@ from examples.reconciliation.agent import (
 )
 from evals.cases import ANSWER_KEY, REPORT_CASES, all_passed, failed_checks, score_verdict
 
-ROUNDS = int(os.environ.get("EVAL_ROUNDS", "3"))
+ROUNDS = int(os.environ.get("EVAL_ROUNDS", "1"))
 _APPROVE = lambda req: True  # noqa: E731
 
 

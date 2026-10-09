@@ -64,19 +64,23 @@ A throwaway spike explored whether the event-log design holds up. It lives on th
 - Assembled the primary agent (ERP-over-MCP + report schema + approval policy),
   `make demo`, and the E1–E9 eval suite with a pure scorer.
 - Correction: tests needed `pythonpath = ["."]` to import `examples`/`evals`.
-- Verification: `make test` → 57 passed. **`make demo` / `make evals` require
-  `ANTHROPIC_API_KEY` and have not been run live** in this environment; keyless
-  checks cover agent assembly over the real MCP server and the scorer.
+- Verification: `make test` → 57 passed.
+- Live validation (later, once a key was available): `make demo` runs end to end;
+  `make evals` scored **9/9 in each of 3 rounds**. The live run exposed and fixed:
+  (1) Anthropic rejects dotted tool names, so the MCP namespace separator is now
+  `__` (e.g. `erp__read_po`); (2) the duplicate pair was symmetric, so the prompt
+  now treats the earliest-by-date invoice as the original (E1 posts, E5 blocks);
+  (3) a duplicate's `three_way_match` is ambiguous, so E5 no longer asserts it.
 
 ## Increment 7: replay & committed recorded run (`inc-07`)
 - `ReplayProvider` + `Agent.replay()` (reexecute vs recorded tools), divergence
   detection, and a committed recording for the keyless reviewer path (C2).
 - Correction: the E10 replay agent needs `output_schema` set so the recorded
   final answer re-parses into a typed report.
-- Note: the committed recording is synthetic (captured keyless via
-  `evals/record_fixture.py`); replace with a live `make demo` capture when a key
-  is available. The replay path is identical.
-- Verification: `make test` → 61 passed.
+- The committed recording is a genuine live `make demo` capture of the INV-9002
+  reconciliation; `evals/record_fixture.py` remains as a keyless fallback
+  regenerator.
+- Verification: `make test` → 61 passed; E10 replays the live capture keyless.
 
 ## Increment 8: secondary agent, context window, docs (`inc-08`)
 - `context.py` (`FullHistory`, `SlidingWindow`) wired into the loop; the

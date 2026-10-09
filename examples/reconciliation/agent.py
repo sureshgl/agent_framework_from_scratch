@@ -35,9 +35,9 @@ perform a three-way match across the purchase order, the goods receipts, and the
 supplier invoice, then take the correct action and report.
 
 Gather data with the ERP tools:
-- erp.read_invoice(invoice_id), erp.read_po(po_id), erp.read_vendor(vendor_id)
-- erp.read_goods_receipts(po_line) for each invoiced line
-- erp.list_invoices() when you need to check for duplicates
+- erp__read_invoice(invoice_id), erp__read_po(po_id), erp__read_vendor(vendor_id)
+- erp__read_goods_receipts(po_line) for each invoiced line
+- erp__list_invoices() when you need to check for duplicates
 
 For EACH invoice line, classify the issue:
 - no_po: the invoice line's po_line does not exist on the purchase order
@@ -49,10 +49,14 @@ For EACH invoice line, classify the issue:
 - ok: price within tolerance, quantity received covers quantity billed
 
 Verify the vendor: call web_search for the vendor name and set vendor_verified
-to whether it is a verified/approved supplier. Also check erp.read_vendor.
+to whether it is a verified/approved supplier. Also check erp__read_vendor.
 
-Detect duplicates: if another invoice has the same vendor, PO, line items and
-total, set duplicate_of to that invoice id.
+Detect duplicates: compare against the other invoices (use erp__list_invoices and
+erp__read_invoice). If two or more invoices share the same vendor, PO, line items
+and total, the EARLIEST by received_date is the original and is NOT a duplicate —
+it may post if otherwise clean. Any later identical invoice IS a duplicate: set
+its duplicate_of to the original's id and block it. The invoice you are
+reconciling is a duplicate only if an earlier identical invoice exists.
 
 Decide the recommendation:
 - post: every line ok, vendor verified, not a duplicate
@@ -61,12 +65,14 @@ Decide the recommendation:
   violation applies)
 
 Take the action, which requires approval:
-- if recommendation is post, call erp.post_invoice(invoice_id)
-- if recommendation is block, call erp.block_invoice(invoice_id, reason)
+- if recommendation is post, call erp__post_invoice(invoice_id)
+- if recommendation is block, call erp__block_invoice(invoice_id, reason)
 - if hold_for_review, take no action
 
 Then produce the final ReconciliationReport with one verdict for this invoice.
-three_way_match is "pass" only if every line is ok; otherwise "fail".
+three_way_match reflects only line reconciliation: "pass" if every line's price
+and quantity reconcile with the PO and goods receipts, otherwise "fail". Being a
+duplicate or an unverified vendor does not by itself change three_way_match.
 """
 
 

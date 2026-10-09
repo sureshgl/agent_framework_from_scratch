@@ -44,7 +44,7 @@ def test_scorer_flags_a_wrong_recommendation():
 def test_agent_assembles_and_runs_over_mcp(tmp_path):
     # The model is faked (keyless); the ERP tools are the real MCP server.
     provider = FakeProvider([
-        tool_response("c1", "erp.read_invoice", {"invoice_id": "INV-9001"}),
+        tool_response("c1", "erp__read_invoice", {"invoice_id": "INV-9001"}),
         text_response(REPORT_JSON),
     ])
     with erp_toolset() as toolset:
