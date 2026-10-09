@@ -145,9 +145,12 @@ Each increment ends green on `make test`. Milestones marked **DEMOABLE**.
 - Proof — tests: `test_context` (window keeps system + task + recent N);
   secondary completes under FakeProvider with **zero** framework changes (FR-9).
 
+Status: Increments 1–8 landed (commits `inc-01`..`inc-08`), `make test` green at
+each. Live `make demo` / `make evals` pending `ANTHROPIC_API_KEY` (see deviations).
+
 ### Stretch (only if the timebox allows; none blocks the core demo)
 `agent.as_tool()` subagents (FR-S1) → context compaction (FR-S2) → skills
-(FR-S3), each its own increment with its own tests.
+(FR-S3), each its own increment with its own tests. Not started.
 
 ---
 

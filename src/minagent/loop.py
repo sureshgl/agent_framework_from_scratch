@@ -173,7 +173,7 @@ def drive(
             system = f"{system}\n\n{schema_instructions(agent.output_schema)}"
         req = LLMRequest(
             system=system,
-            messages=state.messages,
+            messages=agent.context.view(state.messages),
             tools=[ToolSpec(**t.spec_dict()) for t in agent.tools],
             model=agent.model,
             max_tokens=agent.max_tokens,

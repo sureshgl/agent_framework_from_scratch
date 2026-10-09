@@ -6,6 +6,7 @@ Public API (increment 1). More is exported as later increments land.
 from .agent import DEFAULT_MODEL, Agent, RunResult
 from .budgets import Budgets
 from .builtins import read_file_tool, shell_tool, web_search_tool, write_file_tool
+from .context import ContextStrategy, FullHistory, SlidingWindow
 from .events import Event, EventLog, EventType
 from .mcp_tools import MCPToolset
 from .hooks import Hook, HookContext, HookPoint
@@ -47,6 +48,9 @@ __all__ = [
     "shell_tool",
     "web_search_tool",
     "MCPToolset",
+    "ContextStrategy",
+    "FullHistory",
+    "SlidingWindow",
     "tool",
     "Tool",
     "Event",

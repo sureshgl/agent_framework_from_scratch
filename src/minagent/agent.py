@@ -17,6 +17,7 @@ from typing import Any, Callable, Iterable
 from pydantic import BaseModel, ValidationError
 
 from .budgets import Budgets
+from .context import ContextStrategy, FullHistory
 from .events import EventLog, EventType
 from .hooks import Hook
 from .loop import Approver, drive
@@ -72,6 +73,7 @@ class Agent:
         budgets: Budgets | None = None,
         policy: Policy | None = None,
         hooks: Iterable[Hook] = (),
+        context: ContextStrategy | None = None,
         output_schema: type[BaseModel] | None = None,
         max_output_retries: int = 2,
         max_tokens: int = 1024,
@@ -88,6 +90,7 @@ class Agent:
         self.budgets = budgets if budgets is not None else Budgets(max_steps=max_steps)
         self.policy = policy if policy is not None else Policy()
         self.hooks = list(hooks)
+        self.context = context if context is not None else FullHistory()
         self.output_schema = output_schema
         self.max_output_retries = max_output_retries
         self.max_tokens = max_tokens
