@@ -27,6 +27,7 @@ class EventType(str, Enum):
     approval_decided = "approval_decided"
     tool_started = "tool_started"
     tool_result = "tool_result"
+    output_rejected = "output_rejected"
     run_paused = "run_paused"
     budget_exceeded = "budget_exceeded"
     run_failed = "run_failed"

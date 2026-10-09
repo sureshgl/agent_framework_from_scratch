@@ -14,6 +14,8 @@ from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Any, Callable, Iterable
 
+from pydantic import BaseModel, ValidationError
+
 from .budgets import Budgets
 from .events import EventLog
 from .hooks import Hook
@@ -69,6 +71,8 @@ class Agent:
         budgets: Budgets | None = None,
         policy: Policy | None = None,
         hooks: Iterable[Hook] = (),
+        output_schema: type[BaseModel] | None = None,
+        max_output_retries: int = 2,
         max_tokens: int = 1024,
         store_dir: str = ".runs",
         on_event: Iterable[Callable] = (),
@@ -83,9 +87,26 @@ class Agent:
         self.budgets = budgets if budgets is not None else Budgets(max_steps=max_steps)
         self.policy = policy if policy is not None else Policy()
         self.hooks = list(hooks)
+        self.output_schema = output_schema
+        self.max_output_retries = max_output_retries
         self.max_tokens = max_tokens
         self.store_dir = store_dir
         self.on_event = list(on_event)
+
+    def _finalize(self, result: RunResult) -> RunResult:
+        """Re-parse a completed run's output into the declared schema type, so
+        callers get a typed object rather than the dict stored in the log."""
+        if (
+            self.output_schema is not None
+            and result.status == "completed"
+            and result.output is not None
+            and not isinstance(result.output, BaseModel)
+        ):
+            try:
+                result.output = self.output_schema.model_validate(result.output)
+            except ValidationError:
+                pass
+        return result
 
     @property
     def provider(self) -> Provider:
@@ -107,7 +128,7 @@ class Agent:
             {"task": task, "agent_name": self.name, "model": self.model},
         )
         drive(self, log, approver=approver)
-        return _result_from_log(log)
+        return self._finalize(_result_from_log(log))
 
     def resume(
         self,
@@ -132,4 +153,4 @@ class Agent:
             )
         log.append("run_resumed", {"by": "resume"})
         drive(self, log, approver=approver)
-        return _result_from_log(log)
+        return self._finalize(_result_from_log(log))

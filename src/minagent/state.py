@@ -85,6 +85,14 @@ def project(events: list[Event]) -> RunState:
             }
         elif ev.type == EventType.approval_decided:
             state.approvals[ev.data["call_id"]] = bool(ev.data["approved"])
+        elif ev.type == EventType.output_rejected:
+            flush_results()
+            feedback = (
+                "Your previous response did not match the required JSON schema.\n"
+                f"Validation error:\n{ev.data.get('error', '')}\n"
+                "Respond again with ONLY a JSON value matching the schema."
+            )
+            state.messages.append(Message(role="user", content=[TextBlock(text=feedback)]))
         elif ev.type == EventType.run_completed:
             state.terminal = True
             state.status = "completed"

@@ -16,6 +16,7 @@ from .messages import (
     ToolUseBlock,
     Usage,
 )
+from .output import schema_instructions, validate_output
 from .policy import ApprovalRequest, Decision, Policy, Rule, most_restrictive
 from .provider import LLMRequest, LLMResponse, Provider, ToolSpec
 from .state import PendingCall, RunState, project
@@ -36,6 +37,8 @@ __all__ = [
     "Hook",
     "HookContext",
     "HookPoint",
+    "schema_instructions",
+    "validate_output",
     "tool",
     "Tool",
     "Event",

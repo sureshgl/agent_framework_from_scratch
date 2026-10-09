@@ -179,6 +179,10 @@ Each increment ends green on `make test`. Milestones marked **DEMOABLE**.
   `python -m evals.run`.
 - **OpenAI-compatible adapter dropped** (interface-only per `intent.md`): update
   spec §4.5 and remove it from §15 Inc 7.
+- **Added event type `output_rejected`** (Inc 4), not in spec §7.1 — it carries
+  the structured-output validation error back into the conversation as a user
+  message so retry-with-feedback stays in the log and replays faithfully. Spec
+  §7.1 / §9 to be updated to list it.
 
 ## Verification (end to end)
 - `make test` → ends with `N passed`, no failures (unit, no network/key).

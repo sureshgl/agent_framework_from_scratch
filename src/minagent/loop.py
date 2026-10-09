@@ -23,6 +23,7 @@ from .budgets import elapsed_seconds
 from .events import EventLog
 from .hooks import HookContext, HookPoint
 from .messages import TextBlock, ToolUseBlock
+from .output import schema_instructions, validate_output
 from .policy import ApprovalRequest, Decision, most_restrictive
 from .provider import LLMRequest, ToolSpec
 from .state import PendingCall, RunState, project
@@ -148,8 +149,11 @@ def drive(agent: "Agent", log: EventLog, approver: Optional[Approver] = None) ->
             log.append("budget_exceeded", {"which": which, "limit": limit, "actual": actual})
             break
 
+        system = agent.instructions
+        if agent.output_schema is not None:
+            system = f"{system}\n\n{schema_instructions(agent.output_schema)}"
         req = LLMRequest(
-            system=agent.instructions,
+            system=system,
             messages=state.messages,
             tools=[ToolSpec(**t.spec_dict()) for t in agent.tools],
             model=agent.model,
@@ -178,5 +182,21 @@ def drive(agent: "Agent", log: EventLog, approver: Optional[Approver] = None) ->
 
         if not any(isinstance(b, ToolUseBlock) for b in resp.content):
             text = "".join(b.text for b in resp.content if isinstance(b, TextBlock))
-            log.append("run_completed", {"output": text, "usage_total": resp.usage.model_dump()})
-            break
+            if agent.output_schema is None:
+                log.append("run_completed", {"output": text, "usage_total": resp.usage.model_dump()})
+                break
+
+            obj, error = validate_output(agent.output_schema, text)
+            if error is None:
+                log.append("run_completed", {"output": obj.model_dump(),
+                                             "usage_total": resp.usage.model_dump()})
+                break
+            # Retry with feedback, bounded by max_output_retries.
+            attempts = sum(1 for ev in log.events()
+                           if ev.type.value == "output_rejected")
+            if attempts >= agent.max_output_retries:
+                log.append("run_failed", {
+                    "error": f"output did not match schema after {attempts} retries: {error}",
+                    "where": "output_validation"})
+                break
+            log.append("output_rejected", {"error": error, "attempt": attempts + 1})
