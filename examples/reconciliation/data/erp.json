@@ -1,0 +1,62 @@
+{
+  "vendors": [
+    {"vendor_id": "V100", "name": "Acme Corp", "approved": true, "tax_id": "US-11-1111111", "country": "US"},
+    {"vendor_id": "V200", "name": "Globex Industries", "approved": true, "tax_id": "US-22-2222222", "country": "US"},
+    {"vendor_id": "V900", "name": "Shady Supplies LLC", "approved": false, "tax_id": "US-99-9999999", "country": "US"}
+  ],
+  "purchase_orders": [
+    {"po_id": "PO-1001", "vendor_id": "V100", "currency": "USD", "lines": [
+      {"po_line": "PO-1001-10", "material": "WIDGET", "qty_ordered": 100, "unit_price": 2.50}
+    ]},
+    {"po_id": "PO-1002", "vendor_id": "V200", "currency": "USD", "lines": [
+      {"po_line": "PO-1002-10", "material": "GADGET", "qty_ordered": 50, "unit_price": 10.00},
+      {"po_line": "PO-1002-20", "material": "BOLT", "qty_ordered": 1000, "unit_price": 0.10}
+    ]},
+    {"po_id": "PO-1003", "vendor_id": "V100", "currency": "USD", "lines": [
+      {"po_line": "PO-1003-10", "material": "CABLE", "qty_ordered": 200, "unit_price": 1.00}
+    ]},
+    {"po_id": "PO-1004", "vendor_id": "V200", "currency": "USD", "lines": [
+      {"po_line": "PO-1004-10", "material": "PANEL", "qty_ordered": 10, "unit_price": 100.00}
+    ]},
+    {"po_id": "PO-1005", "vendor_id": "V900", "currency": "USD", "lines": [
+      {"po_line": "PO-1005-10", "material": "MYSTERY", "qty_ordered": 5, "unit_price": 50.00}
+    ]}
+  ],
+  "goods_receipts": [
+    {"gr_id": "GR-5001", "po_line": "PO-1001-10", "qty_received": 100, "received_date": "2026-09-01"},
+    {"gr_id": "GR-5002", "po_line": "PO-1002-10", "qty_received": 50, "received_date": "2026-09-02"},
+    {"gr_id": "GR-5003", "po_line": "PO-1002-20", "qty_received": 1000, "received_date": "2026-09-02"},
+    {"gr_id": "GR-5004", "po_line": "PO-1003-10", "qty_received": 150, "received_date": "2026-09-03"},
+    {"gr_id": "GR-5006", "po_line": "PO-1005-10", "qty_received": 5, "received_date": "2026-09-05"}
+  ],
+  "invoices": [
+    {"invoice_id": "INV-9001", "vendor_id": "V100", "po_id": "PO-1001", "currency": "USD",
+     "lines": [{"po_line": "PO-1001-10", "qty_billed": 100, "unit_price": 2.50}],
+     "total": 250.00, "received_date": "2026-09-10"},
+
+    {"invoice_id": "INV-9002", "vendor_id": "V200", "po_id": "PO-1002", "currency": "USD",
+     "lines": [{"po_line": "PO-1002-10", "qty_billed": 50, "unit_price": 10.00},
+               {"po_line": "PO-1002-20", "qty_billed": 1000, "unit_price": 0.105}],
+     "total": 605.00, "received_date": "2026-09-11"},
+
+    {"invoice_id": "INV-9003", "vendor_id": "V100", "po_id": "PO-1003", "currency": "USD",
+     "lines": [{"po_line": "PO-1003-10", "qty_billed": 200, "unit_price": 1.00}],
+     "total": 200.00, "received_date": "2026-09-12"},
+
+    {"invoice_id": "INV-9004", "vendor_id": "V200", "po_id": "PO-1004", "currency": "USD",
+     "lines": [{"po_line": "PO-1004-10", "qty_billed": 10, "unit_price": 100.00}],
+     "total": 1000.00, "received_date": "2026-09-13"},
+
+    {"invoice_id": "INV-9005", "vendor_id": "V100", "po_id": "PO-1001", "currency": "USD",
+     "lines": [{"po_line": "PO-1001-10", "qty_billed": 100, "unit_price": 2.50}],
+     "total": 250.00, "received_date": "2026-09-14"},
+
+    {"invoice_id": "INV-9006", "vendor_id": "V900", "po_id": "PO-1005", "currency": "USD",
+     "lines": [{"po_line": "PO-1005-10", "qty_billed": 5, "unit_price": 50.00}],
+     "total": 250.00, "received_date": "2026-09-15"},
+
+    {"invoice_id": "INV-9007", "vendor_id": "V200", "po_id": "PO-1002", "currency": "USD",
+     "lines": [{"po_line": "PO-9999-10", "qty_billed": 1, "unit_price": 5.00}],
+     "total": 5.00, "received_date": "2026-09-16"}
+  ]
+}

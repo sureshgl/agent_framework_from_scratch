@@ -5,7 +5,9 @@ Public API (increment 1). More is exported as later increments land.
 
 from .agent import DEFAULT_MODEL, Agent, RunResult
 from .budgets import Budgets
+from .builtins import read_file_tool, shell_tool, web_search_tool, write_file_tool
 from .events import Event, EventLog, EventType
+from .mcp_tools import MCPToolset
 from .hooks import Hook, HookContext, HookPoint
 from .loop import Approver
 from .messages import (
@@ -39,6 +41,11 @@ __all__ = [
     "HookPoint",
     "schema_instructions",
     "validate_output",
+    "read_file_tool",
+    "write_file_tool",
+    "shell_tool",
+    "web_search_tool",
+    "MCPToolset",
     "tool",
     "Tool",
     "Event",

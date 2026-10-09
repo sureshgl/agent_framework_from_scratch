@@ -183,6 +183,11 @@ Each increment ends green on `make test`. Milestones marked **DEMOABLE**.
   the structured-output validation error back into the conversation as a user
   message so retry-with-feedback stays in the log and replays faithfully. Spec
   §7.1 / §9 to be updated to list it.
+- **MCP is 2.x** (Inc 5): the installed `mcp` is 2.3; the server uses
+  `mcp.server.mcpserver.MCPServer` (FastMCP renamed) and tools raise `ToolError`
+  so the reason reaches the agent. Spec §8 wording ("FastMCP") to be updated.
+- **web_search is fixture-backed only** (Inc 5): deterministic/offline per
+  C-websearch; live provider server-side search is not wired in this build.
 
 ## Verification (end to end)
 - `make test` → ends with `N passed`, no failures (unit, no network/key).
