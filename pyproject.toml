@@ -22,3 +22,4 @@ packages = ["src/minagent"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
+pythonpath = ["."]

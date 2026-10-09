@@ -1,0 +1,9 @@
+{
+  "INV-9001": {"recommendation": "post",            "three_way_match": "pass", "issue": "ok",            "vendor_verified": true,  "duplicate_of": null},
+  "INV-9002": {"recommendation": "block",           "three_way_match": "fail", "issue": "price_variance", "vendor_verified": true,  "duplicate_of": null},
+  "INV-9003": {"recommendation": "hold_for_review", "three_way_match": "fail", "issue": "qty_variance",   "vendor_verified": true,  "duplicate_of": null},
+  "INV-9004": {"recommendation": "block",           "three_way_match": "fail", "issue": "missing_gr",     "vendor_verified": true,  "duplicate_of": null},
+  "INV-9005": {"recommendation": "block",           "three_way_match": "pass", "issue": "ok",            "vendor_verified": true,  "duplicate_of": "INV-9001"},
+  "INV-9006": {"recommendation": "hold_for_review", "three_way_match": "pass", "issue": "ok",            "vendor_verified": false, "duplicate_of": null},
+  "INV-9007": {"recommendation": "block",           "three_way_match": "fail", "issue": "no_po",          "vendor_verified": true,  "duplicate_of": null}
+}

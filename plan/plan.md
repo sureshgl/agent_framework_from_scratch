@@ -188,6 +188,12 @@ Each increment ends green on `make test`. Milestones marked **DEMOABLE**.
   so the reason reaches the agent. Spec §8 wording ("FastMCP") to be updated.
 - **web_search is fixture-backed only** (Inc 5): deterministic/offline per
   C-websearch; live provider server-side search is not wired in this build.
+- **Inc 6 live verification pending a key**: the reconciliation agent, `make
+  demo`, and the E1-E9 eval suite are built and verified keyless (assembly over
+  the real MCP server + scorer unit tests); `make demo` / `make evals` need
+  `ANTHROPIC_API_KEY` and have not yet been run live. Recommendation mapping is
+  fixed in the prompt + `answer_key.json` (qty_variance -> hold, duplicate ->
+  block; resolves C-policy-ambiguity for this dataset).
 
 ## Verification (end to end)
 - `make test` → ends with `N passed`, no failures (unit, no network/key).

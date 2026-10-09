@@ -1,0 +1,10 @@
+{
+  "rules": [
+    {"pattern": "erp.read_*", "action": "allow"},
+    {"pattern": "erp.list_*", "action": "allow"},
+    {"pattern": "web_search", "action": "allow"},
+    {"pattern": "erp.post_invoice", "action": "ask"},
+    {"pattern": "erp.block_invoice", "action": "ask"},
+    {"pattern": "*", "action": "deny"}
+  ]
+}
