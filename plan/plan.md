@@ -42,7 +42,8 @@ src/minagent/
     anthropic.py     AnthropicProvider (wraps the anthropic SDK)
     replay.py        ReplayProvider (returns recorded llm_response events)
   tools.py           @tool decorator, Tool protocol, JSON-schema from type hints
-  policy.py          Decision, Rule, Budgets, Policy (glob rules, fail-closed)
+  budgets.py         Budgets + check (named terminal limits)   [landed Inc 2]
+  policy.py          Decision, Rule, Policy (glob rules, fail-closed; imports Budgets)
   hooks.py           HookPoint, Hook, HookContext
   loop.py            the drive loop: _drive(agent, log) shared by run/resume/replay
   agent.py           Agent, RunResult, Approver
@@ -79,6 +80,8 @@ Each increment ends green on `make test`. Milestones marked **DEMOABLE**.
 - Files: complete `state.py` `project()`; `RunResult` derivation in `agent.py`;
   wire `ConsoleTracer` via `EventLog.subscribe`; full `Budgets` (tokens, cost,
   wallclock, tool-call count) + `budget_exceeded` in `loop.py`.
+  (Deviation: `Budgets` lives in its own `budgets.py`, not `policy.py`, to keep
+  modules small; `policy.py` in Inc 3 imports it.)
 - Proof — tests: budget cases per limit type; `RunResult.status` derived from the
   terminal event; tracer receives events in order. Assert the loop keeps **no**
   state outside the log (NFR-5) by re-projecting mid-run.

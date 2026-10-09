@@ -16,6 +16,7 @@ from typing import Any, TYPE_CHECKING
 
 from pydantic import BaseModel, ValidationError
 
+from .budgets import elapsed_seconds
 from .events import EventLog
 from .messages import TextBlock, ToolUseBlock
 from .provider import LLMRequest, ToolSpec
@@ -83,11 +84,10 @@ def drive(agent: "Agent", log: EventLog) -> None:
                 _settle_call(agent, log, call)
             continue
 
-        if agent.max_steps is not None and state.step_count >= agent.max_steps:
-            log.append(
-                "budget_exceeded",
-                {"which": "max_steps", "limit": agent.max_steps, "actual": state.step_count},
-            )
+        hit = agent.budgets.check(state, elapsed_seconds(log.events()))
+        if hit is not None:
+            which, limit, actual = hit
+            log.append("budget_exceeded", {"which": which, "limit": limit, "actual": actual})
             break
 
         req = LLMRequest(

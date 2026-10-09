@@ -4,6 +4,7 @@ Public API (increment 1). More is exported as later increments land.
 """
 
 from .agent import DEFAULT_MODEL, Agent, RunResult
+from .budgets import Budgets
 from .events import Event, EventLog, EventType
 from .messages import (
     ContentBlock,
@@ -22,6 +23,7 @@ __all__ = [
     "Agent",
     "RunResult",
     "DEFAULT_MODEL",
+    "Budgets",
     "tool",
     "Tool",
     "Event",

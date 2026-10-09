@@ -13,6 +13,7 @@ import uuid
 from dataclasses import dataclass, field
 from typing import Any, Callable, Iterable
 
+from .budgets import Budgets
 from .events import EventLog
 from .loop import drive
 from .messages import Usage
@@ -55,6 +56,7 @@ class Agent:
         provider: Provider | None = None,
         model: str | None = None,
         max_steps: int | None = 10,
+        budgets: Budgets | None = None,
         max_tokens: int = 1024,
         store_dir: str = ".runs",
         on_event: Iterable[Callable] = (),
@@ -65,7 +67,8 @@ class Agent:
         self.tools_by_name = {t.name: t for t in self.tools}
         self._provider = provider
         self.model = model or os.environ.get("MINAGENT_MODEL", DEFAULT_MODEL)
-        self.max_steps = max_steps
+        # `budgets` is authoritative; `max_steps` is a convenience that seeds it.
+        self.budgets = budgets if budgets is not None else Budgets(max_steps=max_steps)
         self.max_tokens = max_tokens
         self.store_dir = store_dir
         self.on_event = list(on_event)
