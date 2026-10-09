@@ -25,7 +25,7 @@ from .hooks import HookContext, HookPoint
 from .messages import TextBlock, ToolUseBlock
 from .output import schema_instructions, validate_output
 from .policy import ApprovalRequest, Decision, most_restrictive
-from .provider import LLMRequest, ToolSpec
+from .provider import LLMRequest, Provider, ReplayDivergence, ToolSpec
 from .state import PendingCall, RunState, project
 
 if TYPE_CHECKING:
@@ -90,9 +90,21 @@ def _execute(agent: "Agent", log: EventLog, tool: "Tool", call: PendingCall, sta
 
 
 def _settle_call(
-    agent: "Agent", log: EventLog, call: PendingCall, state: RunState, approver: Optional[Approver]
+    agent: "Agent",
+    log: EventLog,
+    call: PendingCall,
+    state: RunState,
+    approver: Optional[Approver],
+    recorded_results: Optional[dict] = None,
 ) -> bool:
     """Settle one pending call. Returns True if the run must pause."""
+    # Hermetic replay: serve the recorded result without a tool, policy, or
+    # approval (the recording already reflects those).
+    if recorded_results is not None and call.call_id in recorded_results:
+        log.append("tool_started", {"call_id": call.call_id, "tool": call.tool, "args": call.args})
+        log.append("tool_result", recorded_results[call.call_id])
+        return False
+
     tool = agent.tools_by_name.get(call.tool)
     if tool is None:
         _error_result(log, call, f"unknown tool: {call.tool!r}")
@@ -130,7 +142,14 @@ def _settle_call(
     return False
 
 
-def drive(agent: "Agent", log: EventLog, approver: Optional[Approver] = None) -> None:
+def drive(
+    agent: "Agent",
+    log: EventLog,
+    approver: Optional[Approver] = None,
+    provider: Optional[Provider] = None,
+    recorded_results: Optional[dict] = None,
+) -> None:
+    provider = provider or agent.provider
     while True:
         state = project(log.events())
 
@@ -139,7 +158,7 @@ def drive(agent: "Agent", log: EventLog, approver: Optional[Approver] = None) ->
 
         if state.pending_calls:
             # Settle one call per iteration, then re-project.
-            if _settle_call(agent, log, state.pending_calls[0], state, approver):
+            if _settle_call(agent, log, state.pending_calls[0], state, approver, recorded_results):
                 break
             continue
 
@@ -167,7 +186,10 @@ def drive(agent: "Agent", log: EventLog, approver: Optional[Approver] = None) ->
 
         log.append("llm_request", {"model": agent.model, "n_messages": len(state.messages)})
         try:
-            resp = agent.provider.complete(req)
+            resp = provider.complete(req)
+        except ReplayDivergence as e:
+            log.append("run_failed", {"error": str(e), "where": "replay-divergence"})
+            break
         except Exception as e:
             log.append("run_failed", {"error": f"{type(e).__name__}: {e}", "where": "provider"})
             break

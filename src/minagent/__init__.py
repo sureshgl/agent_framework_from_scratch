@@ -20,7 +20,8 @@ from .messages import (
 )
 from .output import schema_instructions, validate_output
 from .policy import ApprovalRequest, Decision, Policy, Rule, most_restrictive
-from .provider import LLMRequest, LLMResponse, Provider, ToolSpec
+from .provider import LLMRequest, LLMResponse, Provider, ReplayDivergence, ToolSpec
+from .providers.replay import ReplayProvider
 from .state import PendingCall, RunState, project
 from .tools import Tool, tool
 from .tracing import ConsoleTracer
@@ -64,5 +65,7 @@ __all__ = [
     "LLMRequest",
     "LLMResponse",
     "ToolSpec",
+    "ReplayProvider",
+    "ReplayDivergence",
     "ConsoleTracer",
 ]

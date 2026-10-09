@@ -194,6 +194,12 @@ Each increment ends green on `make test`. Milestones marked **DEMOABLE**.
   `ANTHROPIC_API_KEY` and have not yet been run live. Recommendation mapping is
   fixed in the prompt + `answer_key.json` (qty_variance -> hold, duplicate ->
   block; resolves C-policy-ambiguity for this dataset).
+- **Inc 7 recorded fixture is synthetic**: `evals/recorded/reconcile_INV-9002.jsonl`
+  was captured keyless via `evals/record_fixture.py` (a scripted model over the
+  real ERP MCP), since no key was available. The replay path is identical for a
+  real capture; replace it with a `make demo` recording when a key is available.
+  E10 (keyless replay of the committed run) lives in `tests/test_replay.py`, not
+  `make evals` (which requires a key), so it runs in the normal `make test`.
 
 ## Verification (end to end)
 - `make test` → ends with `N passed`, no failures (unit, no network/key).

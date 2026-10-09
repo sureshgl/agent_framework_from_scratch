@@ -17,12 +17,13 @@ from typing import Any, Callable, Iterable
 from pydantic import BaseModel, ValidationError
 
 from .budgets import Budgets
-from .events import EventLog
+from .events import EventLog, EventType
 from .hooks import Hook
 from .loop import Approver, drive
 from .messages import Usage
 from .policy import Policy
-from .provider import Provider
+from .provider import LLMResponse, Provider
+from .providers.replay import ReplayProvider
 from .state import project
 from .tools import Tool
 
@@ -153,4 +154,51 @@ class Agent:
             )
         log.append("run_resumed", {"by": "resume"})
         drive(self, log, approver=approver)
+        return self._finalize(_result_from_log(log))
+
+    def replay(self, path: str, replay_tools: str = "reexecute") -> RunResult:
+        """Re-drive a recorded run without calling a model (no key, no network).
+
+        A `ReplayProvider` returns the recorded `llm_response` events in order and
+        recorded `approval_decided` events answer the gates. With
+        `replay_tools="reexecute"` (default) tools run for real (only deterministic
+        for pure tools); with `replay_tools="recorded"` the logged `tool_result`s
+        are served instead, for a fully hermetic replay.
+        """
+        original = EventLog.load(path)
+        events = original.events()
+        responses = [
+            LLMResponse.model_validate(e.data)
+            for e in events
+            if e.type == EventType.llm_response
+        ]
+        decisions = {
+            e.data["call_id"]: bool(e.data["approved"])
+            for e in events
+            if e.type == EventType.approval_decided
+        }
+        recorded_results = None
+        if replay_tools == "recorded":
+            recorded_results = {
+                e.data["call_id"]: e.data for e in events if e.type == EventType.tool_result
+            }
+        started = next((e for e in events if e.type == EventType.run_started), None)
+        task = started.data.get("task", "") if started else ""
+
+        run_id = uuid.uuid4().hex[:12]
+        log = EventLog.create(self.store_dir, run_id)
+        for sink in self.on_event:
+            log.subscribe(sink)
+        log.append(
+            "run_started",
+            {"task": task, "agent_name": self.name, "model": self.model,
+             "replay_of": original.run_id},
+        )
+        drive(
+            self,
+            log,
+            approver=lambda req: decisions.get(req.call_id, False),
+            provider=ReplayProvider(responses),
+            recorded_results=recorded_results,
+        )
         return self._finalize(_result_from_log(log))

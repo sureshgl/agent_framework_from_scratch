@@ -39,3 +39,8 @@ class LLMResponse(BaseModel):
 @runtime_checkable
 class Provider(Protocol):
     def complete(self, req: LLMRequest) -> LLMResponse: ...
+
+
+class ReplayDivergence(Exception):
+    """Raised during replay when the live loop asks for a model response the
+    recording does not contain — i.e. the run diverged from what was recorded."""
