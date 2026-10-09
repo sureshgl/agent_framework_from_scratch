@@ -43,7 +43,7 @@ src/minagent/
     replay.py        ReplayProvider (returns recorded llm_response events)
   tools.py           @tool decorator, Tool protocol, JSON-schema from type hints
   budgets.py         Budgets + check (named terminal limits)   [landed Inc 2]
-  policy.py          Decision, Rule, Policy (glob rules, fail-closed; imports Budgets)
+  policy.py          Decision, Rule, Policy (glob, fail-closed) + ApprovalRequest   [Inc 3]
   hooks.py           HookPoint, Hook, HookContext
   loop.py            the drive loop: _drive(agent, log) shared by run/resume/replay
   agent.py           Agent, RunResult, Approver

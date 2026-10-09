@@ -6,6 +6,8 @@ Public API (increment 1). More is exported as later increments land.
 from .agent import DEFAULT_MODEL, Agent, RunResult
 from .budgets import Budgets
 from .events import Event, EventLog, EventType
+from .hooks import Hook, HookContext, HookPoint
+from .loop import Approver
 from .messages import (
     ContentBlock,
     Message,
@@ -14,6 +16,7 @@ from .messages import (
     ToolUseBlock,
     Usage,
 )
+from .policy import ApprovalRequest, Decision, Policy, Rule, most_restrictive
 from .provider import LLMRequest, LLMResponse, Provider, ToolSpec
 from .state import PendingCall, RunState, project
 from .tools import Tool, tool
@@ -24,6 +27,15 @@ __all__ = [
     "RunResult",
     "DEFAULT_MODEL",
     "Budgets",
+    "Policy",
+    "Rule",
+    "Decision",
+    "most_restrictive",
+    "ApprovalRequest",
+    "Approver",
+    "Hook",
+    "HookContext",
+    "HookPoint",
     "tool",
     "Tool",
     "Event",

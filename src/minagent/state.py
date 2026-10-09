@@ -27,11 +27,14 @@ class RunState:
     messages: list[Message] = field(default_factory=list)
     pending_calls: list[PendingCall] = field(default_factory=list)
     terminal: bool = False
+    paused: bool = False
     status: str | None = None
     output: Any = None
     step_count: int = 0        # number of llm_response events
     tool_call_count: int = 0   # number of tool_result events
     usage: Usage = field(default_factory=Usage)
+    approvals: dict[str, bool] = field(default_factory=dict)        # call_id -> decided
+    approval_requests: dict[str, dict] = field(default_factory=dict)  # call_id -> {tool, args}
 
 
 def _result_block(ev: Event) -> ToolResultBlock:
@@ -75,6 +78,13 @@ def project(events: list[Event]) -> RunState:
             pending_results.append(_result_block(ev))
             resolved_ids.add(ev.data["call_id"])
             state.tool_call_count += 1
+        elif ev.type == EventType.approval_requested:
+            state.approval_requests[ev.data["call_id"]] = {
+                "tool": ev.data.get("tool"),
+                "args": ev.data.get("args", {}),
+            }
+        elif ev.type == EventType.approval_decided:
+            state.approvals[ev.data["call_id"]] = bool(ev.data["approved"])
         elif ev.type == EventType.run_completed:
             state.terminal = True
             state.status = "completed"
@@ -89,6 +99,12 @@ def project(events: list[Event]) -> RunState:
             state.status = "paused"
 
     flush_results()
+
+    # A run is paused iff its very last event is run_paused (a resume appends
+    # run_resumed after it, so a resumed run is no longer paused).
+    state.paused = bool(events) and events[-1].type == EventType.run_paused
+    if state.paused and state.status is None:
+        state.status = "paused"
 
     # Pending tool calls = tool_use blocks from the last response not yet resolved.
     if not state.terminal:
